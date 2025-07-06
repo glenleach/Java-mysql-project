@@ -5,6 +5,8 @@
 
 A full-stack Java Spring Boot application with MySQL, packaged for easy Docker deployment. The app features a modern UI for managing team member roles, with avatars and edit functionality.
 
+![App Screenshot](images/screenshot.png)
+
 ---
 
 ## Project Structure

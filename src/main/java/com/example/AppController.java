@@ -23,7 +23,7 @@ public class AppController {
     }
 
     @GetMapping("/get-data")
-    public ResponseEntity getData() {
+    public ResponseEntity<List<User>> getData() {
         List<User> users = fetchDataFromDB();
         return ResponseEntity.ok(users);
     }
@@ -73,12 +73,11 @@ public class AppController {
         return users;
     }
 
-    private static class User {
-        String name;
-        String role;
+    public static class User {
+        private String name;
+        private String role;
 
-        private User() {
-
+        public User() {
         }
 
         public User(String name, String role) {
@@ -86,11 +85,11 @@ public class AppController {
             this.role = role;
         }
 
-        private void setName(String name) {
+        public void setName(String name) {
             this.name = name;
         }
 
-        private void setRole(String role) {
+        public void setRole(String role) {
             this.role = role;
         }
 

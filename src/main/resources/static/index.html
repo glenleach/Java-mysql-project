@@ -1,173 +1,246 @@
+<!DOCTYPE html>
 <html lang="en">
-<style>
-    .container {
-        margin: 40px auto;
-        width: 80%;
-    }
-    .button {
-        width: 160px;
-        height: 45px;
-        border-radius: 6px;
-        font-size: 15px;
-        margin-top: 20px;
-    }
-    img {
-        width: 328px;
-        height: 287px;
-        display: block;
-        margin-bottom: 20px;
-    }
-    hr {
-        width: 400px;
-        margin-left: 0;
-    }
-    h3 {
-        display: inline-block;
-    }
-    #container {
-        display: none;
-    }
-    #container-edit {
-        display: none;
-    }
-    #container-edit li {
-        margin: 10px;
-    }
-    #container-edit input {
-        height: 32px;
-        margin-left: 30px;
-    }
-    #container-edit input {
-        width: 195px;
-        font-size: 15px;
-    }
-</style>
-<script>
-  // HOST must be the server IP or DNS name when app running on a server
-  // and localhost when running locally
-  const HOST = "localhost";
-  
-  (async function init() {
-    const response = await fetch(`http://${HOST}:8080/get-data`);
-    console.log("response", response);
-    const data = await response.json();
-    console.log("stringified data: " + JSON.stringify(data));
-
-    let element = document.getElementById('member-roles');
-    let editElement = document.getElementById('member-roles-edit');
-    data.forEach(user => {
-      let li = document.createElement('li');
-      let spanName = document.createElement('span');
-      let spanSpace = document.createElement('span');
-      let spanRole = document.createElement('span');
-
-      spanRole.setAttribute("id", `role-${user.name}`);
-      spanName.setAttribute("class", "name");
-      li.setAttribute("class", "member-role");
-
-      spanName.innerText = user.name;
-      spanSpace.innerText = ": ";
-      spanRole.innerText = user.role;
-
-      li.appendChild(spanName);
-      li.appendChild(spanSpace);
-      li.appendChild(spanRole);
-      element.appendChild(li);
-
-
-      let editLi = document.createElement('li');
-      let name = document.createElement('span');
-      let label = document.createElement('label');
-      let input = document.createElement('input');
-
-      name.innerText = user.name;
-      name.setAttribute("class", "name-edit");
-      label.setAttribute("for", `input-role-${user.name}`);
-      input.setAttribute("id", `input-role-${user.name}`);
-      input.setAttribute("type", "text");
-      editLi.setAttribute("class", "member-role-edit");
-
-      editLi.appendChild(name);
-      editLi.appendChild(label);
-      editLi.appendChild(input);
-
-      editElement.appendChild(editLi);
-    });
-
-    const cont = document.getElementById('container');
-    cont.style.display = 'block';
-  })();
-
-
-  async function handleUpdateProfileRequest() {
-    const contEdit = document.getElementById('container-edit');
-    const cont = document.getElementById('container');
-
-    const payload = [];
-
-    const els = document.getElementsByClassName("member-role-edit");
-    Array.from(els).forEach(el => {
-      const name = el.getElementsByClassName("name-edit").item(0).textContent;
-      const role = document.getElementById(`input-role-${name}`).value;
-
-      payload.push({
-        name: name,
-        role: role
-      });
-    });
-
-    const response = await fetch(`http://${HOST}:8080/update-roles`, {
-      method: "POST",
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    const jsonResponse = await response.json();
-
-    jsonResponse.forEach(member => {
-      document.getElementById(`role-${member.name}`).textContent = member.role;
-    });
-
-
-    cont.style.display = 'block';
-    contEdit.style.display = 'none';
-  }
-
-  function updateRole() {
-    const contEdit = document.getElementById('container-edit');
-    const cont = document.getElementById('container');
-
-    const els = document.getElementsByClassName("member-role");
-    Array.from(els).forEach(el => {
-      const name = el.getElementsByClassName("name").item(0).textContent;
-      document.getElementById(`input-role-${name}`).value = document.getElementById(`role-${name}`).textContent;
-    });
-
-    cont.style.display = 'none';
-    contEdit.style.display = 'block';
-  }
-</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Member Roles</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #2d3e50;
+            color: #fff;
+            padding: 32px 0 24px 0;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 32px 16px;
+        }
+        .team-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            padding: 32px 24px;
+            min-width: 220px;
+            max-width: 260px;
+            flex: 1 1 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover {
+            box-shadow: 0 6px 24px rgba(44, 62, 80, 0.13);
+        }
+        .avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: #e0e7ef;
+            display: block;
+            object-fit: cover;
+            margin-bottom: 18px;
+        }
+        .name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #2d3e50;
+        }
+        .role {
+            font-size: 1rem;
+            color: #4a5a6a;
+            margin-bottom: 8px;
+        }
+        .button {
+            background: #2d3e50;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            padding: 12px 32px;
+            margin: 32px auto 0 auto;
+            display: block;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .button:hover {
+            background: #1a2533;
+        }
+        /* Edit mode styles */
+        #container-edit {
+            display: none;
+        }
+        .edit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .edit-item {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            padding: 18px 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .edit-item label {
+            font-weight: 500;
+            color: #2d3e50;
+            min-width: 80px;
+        }
+        .edit-item input {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 1rem;
+            border: 1px solid #cfd8dc;
+            border-radius: 4px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 16px 4px;
+            }
+            .card {
+                min-width: 90vw;
+                max-width: 98vw;
+            }
+        }
+    </style>
+</head>
 <body>
-<div>
-    <h1>Team member roles</h1>
-    <img src='https://tlcpethospitalrc.com/wp-content/uploads/2020/04/Pups.jpg' alt="user-profile">
-</div>
-
-<div class='container' id='container'>
-    <ul id="member-roles"></ul>
-    <button class='button' onclick="updateRole()">Edit</button>
-</div>
-
-<div class='container' id='container-edit'>
-    <ul id="member-roles-edit"></ul>
-    <button class='button' onclick="handleUpdateProfileRequest()">Save</button>
-</div>
+    <header>
+        <h1>Team Member Roles</h1>
+    </header>
+    <div class="container" id="container">
+        <ul class="team-list" id="member-roles"></ul>
+        <button class="button" onclick="updateRole()">Edit Roles</button>
+    </div>
+    <div class="container" id="container-edit">
+        <ul class="edit-list" id="member-roles-edit"></ul>
+        <button class="button" onclick="handleUpdateProfileRequest()">Save</button>
+    </div>
+    <footer style="text-align:center; color:#8a99a8; font-size:0.95rem; margin:32px 0 12px 0;">&copy; 2024 Team Dashboard</footer>
+    <script>
+      const HOST = window.location.hostname;
+      (async function init() {
+        let data;
+        try {
+          const response = await fetch(`http://${HOST}:8080/get-data`);
+          data = await response.json();
+        } catch (e) {
+          // Fallback test data for local testing
+          data = [
+            { name: "Sarah", role: "Full stack developer" },
+            { name: "Bobby", role: "React developer" },
+            { name: "Ari", role: "Java developer" },
+            { name: "Andrea", role: "DevOps engineer" },
+            { name: "Bruno", role: "IT operations" }
+          ];
+        }
+        let element = document.getElementById('member-roles');
+        let editElement = document.getElementById('member-roles-edit');
+        data.forEach(user => {
+          // Card for display
+          let li = document.createElement('li');
+          li.className = 'card';
+          // Avatar (image from ui-avatars.com)
+          let avatar = document.createElement('img');
+          avatar.className = 'avatar';
+          avatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=2d3e50&color=fff&size=72`;
+          avatar.alt = user.name + ' avatar';
+          // Name
+          let name = document.createElement('div');
+          name.className = 'name';
+          name.innerText = user.name;
+          // Role
+          let role = document.createElement('div');
+          role.className = 'role';
+          role.setAttribute('id', `role-${user.name}`);
+          role.innerText = user.role;
+          li.appendChild(avatar);
+          li.appendChild(name);
+          li.appendChild(role);
+          element.appendChild(li);
+          // Edit mode
+          let editLi = document.createElement('li');
+          editLi.className = 'edit-item';
+          let label = document.createElement('label');
+          label.setAttribute('for', `input-role-${user.name}`);
+          label.innerText = user.name;
+          let input = document.createElement('input');
+          input.setAttribute('id', `input-role-${user.name}`);
+          input.setAttribute('type', 'text');
+          input.value = user.role;
+          editLi.appendChild(label);
+          editLi.appendChild(input);
+          editElement.appendChild(editLi);
+        });
+        const cont = document.getElementById('container');
+        cont.style.display = 'block';
+      })();
+      async function handleUpdateProfileRequest() {
+        const contEdit = document.getElementById('container-edit');
+        const cont = document.getElementById('container');
+        const payload = [];
+        const els = document.getElementsByClassName('edit-item');
+        Array.from(els).forEach(el => {
+          const name = el.getElementsByTagName('label')[0].innerText;
+          const role = el.getElementsByTagName('input')[0].value;
+          payload.push({ name: name, role: role });
+        });
+        const response = await fetch(`http://${HOST}:8080/update-roles`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+        const jsonResponse = await response.json();
+        jsonResponse.forEach(member => {
+          document.getElementById(`role-${member.name}`).textContent = member.role;
+        });
+        cont.style.display = 'block';
+        contEdit.style.display = 'none';
+      }
+      function updateRole() {
+        const contEdit = document.getElementById('container-edit');
+        const cont = document.getElementById('container');
+        const els = document.getElementsByClassName('card');
+        Array.from(els).forEach(el => {
+          const name = el.getElementsByClassName('name')[0].textContent;
+          document.getElementById(`input-role-${name}`).value = document.getElementById(`role-${name}`).textContent;
+        });
+        cont.style.display = 'none';
+        contEdit.style.display = 'block';
+      }
+    </script>
 </body>
 </html>
-
-
-
-

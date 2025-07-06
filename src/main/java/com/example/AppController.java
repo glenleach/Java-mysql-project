@@ -29,7 +29,7 @@ public class AppController {
     }
 
     @PostMapping("/update-roles")
-    public ResponseEntity updateRoles(@RequestBody ArrayList<User> users) {
+    public ResponseEntity<List<User>> updateRoles(@RequestBody ArrayList<User> users) {
         updateDatabase(users);
         return ResponseEntity.ok(users);
     }

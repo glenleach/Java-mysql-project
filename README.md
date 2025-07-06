@@ -77,6 +77,9 @@ Once your image is built and pushed to Docker Hub, you can use deployment tools 
 - Pull the image onto a remote server (e.g., EC2)
 - Launch the app using your `docker-compose.yaml`
 
+For a complete example of automated deployment to two EC2 instances using Ansible and Terraform, see:
+[Dockerized-Java-App-Deployment-with-Ansible-Terraform](https://github.com/glenleach/Dockerized-Java-App-Deployment-with-Ansible-Terraform)
+
 Example (on your server):
 ```sh
 docker pull <your-dockerhub-username>/java-image-2.0:latest

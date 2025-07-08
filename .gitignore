@@ -1,6 +1,9 @@
 # Ignore build output
 build/
 
+# Ignore Gradle cache and config
+.gradle/
+
 # Ignore JAR files in build/libs
 build/libs/*.jar
 

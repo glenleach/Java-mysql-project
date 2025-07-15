@@ -5,7 +5,7 @@
 
 A full-stack Java Spring Boot application with MySQL, packaged for easy Docker deployment. The app features a modern UI for managing team member roles, with avatars and edit functionality.
 
-![App Screenshot](https://github.com/glenleach/Java-mysql-project/blob/master/images/screenshot.PNG?raw=true)
+![App Screenshot](https://github.com/glenleach/java-mysql-project/blob/master/images/screenshot.PNG?raw=true)
 
 ---
 
@@ -78,7 +78,7 @@ Once your image is built and pushed to Docker Hub, you can use deployment tools 
 - Launch the app using your `docker-compose.yaml`
 
 For a complete example of automated deployment to two EC2 instances using Ansible and Terraform, see:
-[Dockerized-Java-App-Deployment-with-Ansible-Terraform](https://github.com/glenleach/Dockerized-Java-App-Deployment-with-Ansible-Terraform)
+[Dockerized-Java-App-Deployment-with-Ansible-Terraform](https://github.com/glenleach/dockerized-java-app-deployment-with-ansible-terraform)
 
 Example (on your server):
 ```sh
